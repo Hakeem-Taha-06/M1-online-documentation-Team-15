@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The AM Radio Project · ELEG103</title>
+  <meta name="description" content="A DIY medium-wave AM radio built for ELEG103, documented milestone by milestone. Milestone 1: the tuned circuit and the detector.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="cabinet" id="top">
+  <div class="cabinet-inner">
+    <p class="badge">ELEG103 · SBME · Fall 2026</p>
+    <h1>The <span>AM</span> Radio Project</h1>
+    <p class="tagline">A medium-wave radio, built one milestone at a time</p>
+  </div>
+</header>
+
+<!-- ============ MILESTONE TABS ============ -->
+<nav class="tabs" id="tabs" aria-label="Milestones">
+  <a href="#milestone-1" data-tab="milestone-1">Milestone 1 · Tuner and detector</a>
+  <a href="#milestone-2" data-tab="milestone-2">Milestone 2</a>
+</nav>
+
+<main>
+
+<!-- ################################################################ -->
+<!-- ###################   MILESTONE 1   ############################ -->
+<!-- ################################################################ -->
+<div class="panel" id="milestone-1" data-panel>
+
+  <div class="radio" aria-label="Interactive tuning dial">
+    <div class="grille" aria-hidden="true"></div>
+
+    <div class="dial-panel">
+      <div class="dial-window">
+        <div class="scale" id="scale" aria-hidden="true"></div>
+        <div class="marker marker-target" id="markTarget"><span>819</span></div>
+        <div class="marker marker-mhz" id="markMhz"><span>1 MHz</span></div>
+        <div class="needle" id="needle"></div>
+        <div class="dial-label">KILOCYCLES · MEDIUM WAVE</div>
+      </div>
+
+      <div class="controls">
+        <div class="readout" aria-live="polite">
+          <div><small>tuned to</small><strong id="freq">–</strong></div>
+          <div><small>capacitor</small><strong id="cap">–</strong></div>
+        </div>
+
+        <div class="knob-wrap">
+          <label for="tune">Turn the tuning capacitor</label>
+          <input type="range" id="tune" min="0" max="100" value="50" step="0.5">
+          <div class="ends"><span>280 pF</span><span>20 pF</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="dial-note">This dial is live. It uses our coil's predicted inductance
+      (<span id="Lshow">291</span> µH) and the capacitor's range. Drag it and watch f₀ move.</p>
+  </div>
+
+  <nav class="presets" aria-label="Milestone 1 sections">
+    <a href="#goal">1 · The goal</a>
+    <a href="#journey">2 · The journey</a>
+    <a href="#results">3 · Results</a>
+    <a href="#lessons">4 · Lessons</a>
+    <a href="#next">5 · Next</a>
+  </nav>
+
+  <!-- ============ 1. GOAL ============ -->
+  <section id="goal" class="page">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <p class="folio">Page 1</p>
+    <h2>What Milestone 1 is</h2>
+    <p>
+      Every AM receiver starts with the same two halves. A <strong>tuned circuit</strong> picks one
+      station out of everything the coil catches, and a <strong>detector</strong> pulls the sound out of
+      that station's carrier. Milestone 1 (M1) is exactly those two halves, built by hand.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <h3>The tank</h3>
+        <p>A coil <em>L</em> and a tuning capacitor <em>C</em> resonate at one frequency:</p>
+        <p class="formula">f₀ = 1 / (2π√(LC))</p>
+        <p>Our coil is 75 turns of 0.3 mm enamelled copper wire on a 50 mm PVC pipe. Wheeler's formula for a single-layer coil gives:</p>
+        <p class="formula">L ≈ d²n² / (457d + 1016l) ≈ <b>291 µH</b></p>
+        <p class="small">d = 50 mm, n = 75 turns, l ≈ 25 mm.</p>
+      </div>
+      <div>
+        <h3>The detector</h3>
+        <p>A 1N60P diode and a 15 kΩ // 3.3 nF pair form a peak rectifier. It follows the <em>peaks</em> of the signal, so a steady sine becomes a DC level and an AM station becomes sound.</p>
+        <p class="formula">RC = 15 kΩ × 3.3 nF ≈ <b>49.5 µs</b></p>
+      </div>
+    </div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 760 170" role="img" aria-labelledby="blk-t blk-d">
+        <title id="blk-t">M1 block diagram</title>
+        <desc id="blk-d">Signal source drives a test loop. The loop couples to the coil and tuning capacitor, which feed a diode and RC detector that gives the output at test point 3.</desc>
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3b2415"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="#3b2415" stroke-width="2.5">
+          <rect x="10"  y="50" width="130" height="70" rx="6"/>
+          <rect x="200" y="50" width="130" height="70" rx="6"/>
+          <rect x="390" y="50" width="150" height="70" rx="6"/>
+          <rect x="600" y="50" width="150" height="70" rx="6"/>
+          <line x1="140" y1="85" x2="200" y2="85" marker-end="url(#arr)"/>
+          <line x1="330" y1="85" x2="390" y2="85" marker-end="url(#arr)"/>
+          <line x1="540" y1="85" x2="600" y2="85" marker-end="url(#arr)"/>
+        </g>
+        <g font-family="Courier Prime, monospace" font-size="15" fill="#3b2415" text-anchor="middle">
+          <text x="75"  y="82">signal</text><text x="75"  y="102">source</text>
+          <text x="265" y="82">test loop</text><text x="265" y="102">5 turns</text>
+          <text x="465" y="82">tank</text><text x="465" y="102">75 turns + C</text>
+          <text x="675" y="82">detector</text><text x="675" y="102">1N60P · 15k // 3.3n</text>
+          <text x="465" y="40" font-weight="700">TP1</text>
+          <text x="675" y="40" font-weight="700">TP3</text>
+          <text x="300" y="150" font-style="italic">coupled through the air, a few centimetres apart</text>
+        </g>
+      </svg>
+      <figcaption>Fig. 1 · M1 as we built it. TP1 is the top of the tank; TP3 is the detector's output.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 2. JOURNEY ============ -->
+  <section id="journey" class="page">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <p class="folio">Page 2</p>
+    <h2>The journey</h2>
+    <p class="lead">Designing the circuit took an afternoon. Getting the parts, winding the coil and seeing a clean signal took much longer. This is how it went.</p>
+
+    <ol class="timeline">
+
+      <!-- Chapter 1 -->
+      <li>
+        <div class="stamp">Chapter 1</div>
+        <h3>Hunting for the parts</h3>
+        <p>
+          We started where every Egyptian electronics student starts: downtown, the main market
+          for components. We went from shop to shop. They had the diode, the resistor and the
+          small capacitor, but <strong>nobody had a variable tuning capacitor</strong>, and nobody had
+          the thin enamelled copper wire we needed.
+        </p>
+        <p>
+          One of our classmates then travelled to <strong>Nasr City</strong> and finally found the
+          capacitor. The wire came from a different direction: an old
+          <strong>motor-repair shop</strong> in the hometown of one of our teammates, where rewound
+          motors leave plenty of enamelled copper. The kit lists about 12 m of 0.3 mm wire, and we
+          needed nearly all of it for 75 turns around a 50 mm pipe
+          (75 × π × 50 mm ≈ 11.8 m).
+        </p>
+      </li>
+
+      <!-- Chapter 2 -->
+      <li>
+        <div class="stamp">Chapter 2</div>
+        <h3>Winding the coil by hand</h3>
+        <p>
+          We had no winding machine, so we wound everything <strong>turn by turn by hand</strong>.
+          The rule is simple and strict: every turn lies right next to the previous one, with no gaps
+          and no crossings, so the coil stays a tidy single layer. We wound two coils this way: the
+          <strong>75-turn coil</strong> on the 50 mm PVC pipe for the tank, and the
+          <strong>5-turn test loop</strong> that the signal source drives.
+        </p>
+        <p>
+          We taped the start of the wire to the pipe, wound the turns, taped the end, then scraped
+          about 1 cm of enamel off each end until the copper shone. Winding the 75 turns took about
+          15 minutes. The finished coil is about <strong>30 mm</strong> long, a little longer than the
+          25 mm we assumed in our prediction. Plugging 30 mm into Wheeler's formula gives about
+          264 µH instead of 291 µH, so we expect the real tank to resonate slightly higher than the
+          predicted values.
+        </p>
+      </li>
+
+      <!-- Chapter 3 -->
+      <li>
+        <div class="stamp">Chapter 3</div>
+        <h3>Wiring it on the breadboard</h3>
+        <p>
+          We fixed the tuning capacitor to the pipe and joined the coil's ends to the capacitor's AM
+          section terminals (our grader confirmed which two). On the breadboard we placed the 1N60P
+          from TP1, the top of the tank, to TP3 with its band towards TP3, and then the 15 kΩ and the
+          3.3 nF side by side from TP3 to ground.
+        </p>
+      </li>
+
+      <!-- Chapter 4 -->
+      <li>
+        <div class="stamp">Chapter 4</div>
+        <h3>A source that reaches the band</h3>
+        <p>
+          The circuit can only be tested with a signal inside the medium-wave band, from about 560 kHz to
+          2.1 MHz. Finding a function generator that reached that high turned out to be a problem of its
+          own. We kept searching until we got hold of a <strong>GW Instek GFG-8020H</strong>, which we set to
+          <strong>819.4 kHz</strong> with an amplitude of about 5 V. It drives the 5-turn test loop, which
+          sits a few centimetres from the coil, on the same axis.
+        </p>
+      </li>
+
+      <!-- Chapter 5 -->
+      <li>
+        <div class="stamp">Chapter 5</div>
+        <h3>Fighting the noise on the scope</h3>
+        <p>
+          With the generator running, the first scope pictures were hard to understand. The trace was
+          full of noise and we could not tell which part of it, if any, was our signal. The fix turned out to
+          be tiny: a <strong>switch on the probes</strong>.
+        </p>
+
+        <div class="callout">
+          <strong>The struggle and the solution.</strong>
+          Each probe has a small slide switch that selects <strong>×1</strong> or <strong>×10</strong>.
+          In ×1 the probe connects the circuit straight to the scope, and, as the lab sheet warns, it adds
+          about 100 pF. That is almost as much as the roughly 130 pF our tank needs at 819 kHz, so the
+          probe detunes and loads the circuit, and what reaches the scope is mostly noise. In ×10 the probe
+          divides the signal by ten and adds far less capacitance, so it barely disturbs the tank.
+          We flicked the switch up to ×10 on both probes, and the noise disappeared at once and a clean sine
+          appeared. (The channel's own probe setting must also be on ×10, or the scope's voltage readings come
+          out ten times too small.)
+        </div>
+
+        <p>
+          We then looked at <strong>TP1</strong>. It showed a clean sine at the <strong>same frequency as the
+          source</strong>, about 819 kHz. At <strong>TP3</strong> the detector did its job: the diode only
+          passes one half of each cycle, and the 3.3 nF capacitor smooths that into a small, nearly constant
+          DC level. Seen close up on the scope it ripples slightly, but zoomed out it looks like a straight line,
+          which is what a steady sine should give.
+        </p>
+        <div class="gallery">
+          <figure>
+            <img src="images/scope-tp1.jpg" width="1280" height="960" loading="lazy"
+                 alt="The working radio: coil and breadboard in front, the oscilloscope showing a clean sine at TP1 and the function generator reading 819.4 kHz">
+            <figcaption>TP1: a clean sine at about 819 kHz on the scope, with the generator at 819.4 kHz.</figcaption>
+          </figure>
+          <figure>
+            <img src="images/scope-tp3.jpg" width="1280" height="960" loading="lazy"
+                 alt="The working radio with the oscilloscope showing the small detector output at TP3, zoomed in at 100 millivolts per division">
+            <figcaption>TP3: the detector's output, a small, nearly constant level. This trace is heavily zoomed in (100 mV per division); zoomed out it is almost a straight line.</figcaption>
+          </figure>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ 3. RESULTS ============ -->
+  <section id="results" class="page">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <p class="folio">Page 3</p>
+    <h2>What the numbers say</h2>
+    <p class="lead">Table 4 is calculated by hand. Tables 5 and 6 are laid out and ready for our readings, which are still to come.</p>
+
+    <div class="callout">
+      <strong>No readings were taken yet.</strong>
+      Both times we worked on this circuit in the lab, the lab closed just as we were ready to start
+      measuring, so Tables 5 and 6 are still empty. We plan to take these readings while we work on
+      Milestone 2 and add them here.
+    </div>
+
+    <h3>Table 4 · Predictions</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>L (µH)</th><th>C for 819 kHz (pF)</th><th>f at 280 pF (kHz)</th><th>f at 20 pF (MHz)</th><th>RC (µs)</th></tr></thead>
+        <tbody><tr><td>291</td><td>130</td><td>557</td><td>2.08</td><td>49.5</td></tr></tbody>
+      </table>
+    </div>
+
+    <h3>Table 5 · The tank at TP1</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Band low end (kHz)</th><th>Band high end (MHz)</th><th>f₀ at half travel (kHz)</th><th>f<sub>low</sub> (kHz)</th><th>f<sub>high</sub> (kHz)</th><th>Q</th></tr></thead>
+        <tbody><tr>
+          <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+        </tr></tbody>
+      </table>
+    </div>
+    <p class="small">Half travel is about 150 pF, which predicts f₀ ≈ 761 kHz. Q = f₀ / (f<sub>high</sub> − f<sub>low</sub>).</p>
+
+    <h3>Table 6 · The detector at f₀</h3>
+    <div class="table-wrap narrow">
+      <table>
+        <thead><tr><th>Source setting (V)</th><th>TP1 peak (mV)</th><th>TP3 DC (mV)</th></tr></thead>
+        <tbody>
+          <tr><td>0.05</td><td>—</td><td>—</td></tr>
+          <tr><td>0.1</td><td>—</td><td>—</td></tr>
+          <tr><td>0.2</td><td>—</td><td>—</td></tr>
+          <tr><td>0.3</td><td>—</td><td>—</td></tr>
+          <tr><td>0.5</td><td>—</td><td>—</td></tr>
+          <tr><td>1</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small">The weakest settings may show almost nothing at TP3 because of the diode's dead zone.</p>
+  </section>
+
+  <!-- ============ 4. LESSONS ============ -->
+  <section id="lessons" class="page">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <p class="folio">Page 4</p>
+    <h2>What we learned</h2>
+    <ul class="lessons">
+      <li><b>Parts are part of the design.</b> The market is not a catalogue. Check what exists, and where, before relying on a part.</li>
+      <li><b>A coil is only as good as its winding.</b> Tight, ordered turns are what make Wheeler's formula believable.</li>
+      <li><b>Measuring changes the circuit.</b> A probe's own capacitance can detune a resonant circuit. Moving our probes from ×1 to ×10 was the difference between noise and a clean sine.</li>
+      <li><b>Resonance is selective.</b> Only a narrow range around f₀ passes strongly. That is what lets a radio choose one station.</li>
+      <li><b>Know your instruments' limits.</b> The band starts at 560 kHz, and not every function generator reaches it. Check an instrument's range before the lab slot.</li>
+      <li><b>Protect your measuring time.</b> The lab closed on us just as we were ready to measure, twice. Measuring needs its own booked time, not whatever is left at the end.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 5. NEXT ============ -->
+  <section id="next" class="page">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <p class="folio">Page 5</p>
+    <h2>What comes next</h2>
+    <p>
+      M1 gives us a tuned circuit and a detector. A real receiver also needs <strong>gain</strong> before the detector, so weak
+      stations rise above the diode's dead zone, and gain after it, so the sound can drive a speaker.
+      Those are the next milestones, and each gets its own tab at the top of this page, starting with
+      <a href="#milestone-2">Milestone 2</a>.
+    </p>
+  </section>
+
+</div>
+
+<!-- ################################################################ -->
+<!-- ###################   MILESTONE 2   ############################ -->
+<!-- ################################################################ -->
+<div class="panel" id="milestone-2" data-panel>
+  <section class="page">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <p class="folio">Milestone 2</p>
+    <h2>Milestone 2</h2>
+    <p class="lead">This milestone is still ahead of us.</p>
+    <p>
+      Milestone 2 builds on the tuner and detector from <a href="#milestone-1">Milestone 1</a>. When it is done,
+      this tab will tell its story the same way: the goal, the journey and its challenges, the results and
+      the lessons.
+    </p>
+    <p>
+      It is also when we will take the Milestone 1 readings that the lab schedule kept us from taking.
+      They will be added to the Results section of the Milestone 1 tab.
+    </p>
+  </section>
+</div>
+
+</main>
+
+<footer>
+  <div class="crew">
+    <h3>The crew</h3>
+    <ul>
+      <li>Hakeem Mohammed Ahmed Taha</li>
+      <li>Ziyad Ashraf Mostafa</li>
+      <li>Seif Al-Islam Tamer Hegazy</li>
+    </ul>
+    <p>ELEG103 Analog and Digital Electronics · SBME Department · Fall 2026</p>
+  </div>
+  <p>Built by hand, wire by wire. · <a href="#top">Back to the top ↑</a></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
